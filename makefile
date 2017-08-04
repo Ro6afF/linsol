@@ -5,3 +5,8 @@ build_tests:
 
 run_tests:
 	./tests
+
+update_repo: test
+	git add -A
+	git commit
+	git push

@@ -1,11 +1,14 @@
 use std::cmp::Ordering;
 use std::ops;
 
+#[allow(dead_code)]
+#[derive(Copy, Clone)]
 pub struct InfNum {
     pub real: f64,
     pub inf: f64,
 }
 
+#[allow(dead_code)]
 impl InfNum {
     pub fn new() -> InfNum {
         InfNum {
@@ -13,17 +16,23 @@ impl InfNum {
             inf: 0.0,
         }
     }
+    pub fn from(real: f64, inf: f64) -> InfNum {
+        InfNum {
+            real: real,
+            inf: inf,
+        }
+    }
 }
 
 impl PartialEq for InfNum {
     fn eq(&self, other: &InfNum) -> bool {
         if self.inf != 0.0 && other.inf != 0.0 {
-            true
-        } else if self.inf == other.inf {
-            self.real.eq(&other.real)
-        } else {
-            false
+            return true;
         }
+        if self.inf == other.inf {
+            return self.real.eq(&other.real);
+        }
+        false
     }
 }
 impl Eq for InfNum {}
@@ -59,6 +68,16 @@ impl ops::Add<InfNum> for InfNum {
     }
 }
 
+impl ops::AddAssign<InfNum> for InfNum {
+    fn add_assign(&mut self, other: InfNum) {
+        *self = InfNum {
+            inf: self.inf + other.inf,
+            real: self.real + other.real,
+        };
+    }
+}
+
+
 impl ops::Sub<InfNum> for InfNum {
     type Output = InfNum;
     fn sub(self, other: InfNum) -> InfNum {
@@ -66,6 +85,15 @@ impl ops::Sub<InfNum> for InfNum {
             real: self.real - other.real,
             inf: self.inf - other.inf,
         }
+    }
+}
+
+impl ops::SubAssign<InfNum> for InfNum {
+    fn sub_assign(&mut self, other: InfNum) {
+        *self = InfNum {
+            inf: self.inf - other.inf,
+            real: self.real - other.real,
+        };
     }
 }
 
@@ -79,6 +107,15 @@ impl ops::Mul<InfNum> for InfNum {
     }
 }
 
+impl ops::MulAssign<InfNum> for InfNum {
+    fn mul_assign(&mut self, other: InfNum) {
+        *self = InfNum {
+            inf: self.inf * other.inf,
+            real: self.real * other.real,
+        };
+    }
+}
+
 impl ops::Div<InfNum> for InfNum {
     type Output = InfNum;
     fn div(self, other: InfNum) -> InfNum {
@@ -86,5 +123,14 @@ impl ops::Div<InfNum> for InfNum {
             real: self.real / other.real,
             inf: self.inf / other.inf,
         }
+    }
+}
+
+impl ops::DivAssign<InfNum> for InfNum {
+    fn div_assign(&mut self, other: InfNum) {
+        *self = InfNum {
+            inf: self.inf / other.inf,
+            real: self.real / other.real,
+        };
     }
 }

@@ -1,1 +1,2 @@
-pub mod infNum;
+pub mod inf_num;
+//pub mod function;

@@ -1,10 +1,9 @@
-use std::cmp;
 use std::cmp::Ordering;
 use std::ops;
 
 pub struct InfNum {
-    real: f64,
-    inf: f64,
+    pub real: f64,
+    pub inf: f64,
 }
 
 impl InfNum {

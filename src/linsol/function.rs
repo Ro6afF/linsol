@@ -4,12 +4,11 @@ use std::ops;
 
 #[allow(dead_code)]
 pub struct Function {
-    coeficients: Vec<InfNum>,
-    variables: Vec<String>,
+    pub coeficients: Vec<InfNum>,
+    pub variables: Vec<String>,
 }
-
+#[allow(dead_code)]
 impl Function {
-    #[allow(dead_code)]
     pub fn new() -> Function {
         Function {
             coeficients: Vec::<InfNum>::new(),
@@ -17,7 +16,7 @@ impl Function {
         }
     }
 
-    #[allow(dead_code)]
+
     pub fn add_variable(&mut self, name: String, coeficient: InfNum) -> bool {
         if self.variables.contains(&name) {
             return false;
@@ -27,7 +26,6 @@ impl Function {
         true
     }
 
-    #[allow(dead_code)]
     pub fn change_coeficient(&mut self, name: String, coeficient: InfNum) {
         if self.variables.contains(&name) {
             let index = self.variables
@@ -45,7 +43,6 @@ impl Function {
         }
     }
 
-    #[allow(dead_code)]
     pub fn get_value(&self, values: &HashMap<String, InfNum>) -> InfNum {
         let mut result: InfNum = InfNum::new();
         for i in 0..self.variables.len() {
@@ -56,7 +53,6 @@ impl Function {
         result
     }
 }
-
 impl ops::DivAssign<InfNum> for Function {
     fn div_assign(&mut self, num: InfNum) {
         for i in 0..self.coeficients.len() {

@@ -4,8 +4,31 @@ pub mod linsol;
 mod tests {
     use linsol::inf_num::InfNum;
     use linsol::function::Function;
-    use linsol::constraint;
+    use linsol::constraint::Consraint;
+    use linsol::constraint::Sign;
+    use linsol::constraint::get_random_name;
     use std::collections::HashMap;
+
+    #[test]
+    fn inf_num_comp1() {
+        let inst1 = InfNum::from(0.0, 0.0);
+        let inst2 = InfNum::from(-1.0, 0.0);
+        assert!(inst1 > inst2);
+    }
+
+    #[test]
+    fn inf_num_comp2() {
+        let inst1 = InfNum::from(0.0, 0.0);
+        let inst2 = InfNum::from(-1.0, 1.0);
+        assert!(inst1 < inst2);
+    }
+
+    #[test]
+    fn inf_num_comp3() {
+        let inst1 = InfNum::from(-1.0, 1.0);
+        let inst2 = InfNum::from(-1.0, 1.0);
+        assert!(inst1 == inst2);
+    }
 
     #[test]
     fn inf_num_creation_new() {
@@ -221,15 +244,48 @@ mod tests {
 
     #[test]
     fn random_name() {
-        let inst = constraint::get_random_name(12);
+        let inst = get_random_name(12);
         println!("{}", inst);
         assert!(inst.len() == 12);
     }
 
     #[test]
     fn random_name1() {
-        let inst = constraint::get_random_name(123);
+        let inst = get_random_name(123);
         println!("{}", inst);
         assert!(inst.len() == 123);
+    }
+
+    #[test]
+    fn constraint_check() {
+        let mut inst = Consraint::new();
+        inst.left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 1.0),
+        );
+        inst.sign = Sign::GreaterOrEqual;
+        inst.right = InfNum::from(-1.0, 0.0);
+        let mut vals = HashMap::<String, InfNum>::new();
+        vals.insert(String::from("x"), InfNum::from(0.0, 0.0));
+        assert!(inst.check(&vals));
+    }
+
+    #[test]
+    fn constraint_check1() {
+        let mut inst = Consraint::new();
+        inst.left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 1.0),
+        );
+        inst.left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.5),
+        );
+        inst.sign = Sign::GreaterOrEqual;
+        inst.right = InfNum::from(-1.0, 0.0);
+        let mut vals = HashMap::<String, InfNum>::new();
+        vals.insert(String::from("x"), InfNum::from(0.0, 0.0));
+        vals.insert(String::from("y"), InfNum::from(0.0, 1.0));
+        assert!(inst.check(&vals));
     }
 }

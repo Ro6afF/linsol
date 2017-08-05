@@ -1,5 +1,6 @@
 use linsol::function::Function;
 use linsol::inf_num::InfNum;
+use std::collections::HashMap;
 
 extern crate rand;
 
@@ -12,7 +13,9 @@ pub enum Sign {
 
 #[allow(dead_code)]
 pub fn get_random_name(len: usize) -> String {
-    (0..len).map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char).collect()
+    (0..len)
+        .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
+        .collect()
 }
 
 
@@ -30,6 +33,14 @@ impl Consraint {
             left: Function::new(),
             sign: Sign::Equal,
             right: InfNum::new(),
+        }
+    }
+
+    pub fn check(&self, variables: &HashMap<String, InfNum>) -> bool {
+        match self.sign {
+            Sign::GreaterOrEqual => self.left.get_value(variables) >= self.right,
+            Sign::SmallerOrEqual => self.left.get_value(variables) <= self.right,
+            Sign::Equal => self.left.get_value(variables) == self.right,
         }
     }
 
@@ -56,6 +67,16 @@ impl Consraint {
             self.right *= InfNum::from(-1.0, 1.0);
             self.left *= InfNum::from(-1.0, 1.0);
         }
-        Vec::<Consraint>::new()
+        let mut res: Vec<Consraint> = Vec::<Consraint>::new();
+        for i in &self.left.variables {
+            let mut curr = Function::new();
+            curr.add_variable(i.clone(), InfNum::from(1.0, 0.0));
+            res.push(Consraint {
+                right: InfNum::from(0.0, 0.0),
+                sign: Sign::Equal,
+                left: curr,
+            });
+        }
+        res
     }
 }

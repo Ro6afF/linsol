@@ -1,5 +1,5 @@
 [package]
-name = "simplex_"
+name = "linsol"
 version = "0.1.0"
 authors = ["Ro6afF <dimo_chanev@windowslive.com>"]
 

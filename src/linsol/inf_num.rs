@@ -27,12 +27,12 @@ impl InfNum {
 impl PartialEq for InfNum {
     fn eq(&self, other: &InfNum) -> bool {
         if self.inf != 0.0 && other.inf != 0.0 {
-            return true;
+            true
+        } else if self.inf == other.inf {
+            self.real.eq(&other.real)
+        } else {
+            false
         }
-        if self.inf == other.inf {
-            return self.real.eq(&other.real);
-        }
-        false
     }
 }
 impl Eq for InfNum {}

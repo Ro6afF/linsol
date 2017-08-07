@@ -7,6 +7,8 @@ mod tests {
     use linsol::constraint::Consraint;
     use linsol::constraint::Sign;
     use linsol::constraint::get_random_name;
+    //use linsol::solver::Solver;
+    //use linsol::solver::TargetValue;
     use std::collections::HashMap;
 
     #[test]

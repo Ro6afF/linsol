@@ -43,6 +43,20 @@ impl Function {
         }
     }
 
+    pub fn get_coeficient(&self, variable: String) -> InfNum {
+        if self.variables.contains(&variable) {
+            let index = self.variables
+                .iter()
+                .enumerate()
+                .find(|&r| *r.1 == variable)
+                .unwrap()
+                .0;
+            self.coeficients[index]
+        } else {
+            InfNum::from(0.0, 0.0)
+        }
+    }
+
     pub fn get_value(&self, values: &HashMap<String, InfNum>) -> InfNum {
         let mut result: InfNum = InfNum::new();
         for i in 0..self.variables.len() {

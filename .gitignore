@@ -1,3 +1,4 @@
 .vagrant
 Cargo.lock
 target
+doc

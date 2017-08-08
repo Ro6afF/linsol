@@ -6,10 +6,17 @@ mod tests {
     use linsol::function::Function;
     use linsol::constraint::Consraint;
     use linsol::constraint::Sign;
-    use linsol::constraint::get_random_name;
+    use linsol::utilities::get_random_name;
     //use linsol::solver::Solver;
     //use linsol::solver::TargetValue;
     use std::collections::HashMap;
+
+    #[test]
+    fn inf_num_comp() {
+        let inst1 = InfNum::from(0.0, 2.0);
+        let inst2 = InfNum::from(-1.0, 7.0);
+        assert!(inst1 == inst2);
+    }
 
     #[test]
     fn inf_num_comp1() {
@@ -30,6 +37,20 @@ mod tests {
         let inst1 = InfNum::from(-1.0, 1.0);
         let inst2 = InfNum::from(-1.0, 1.0);
         assert!(inst1 == inst2);
+    }
+
+    #[test]
+    fn inf_num_comp4() {
+        let inst1 = InfNum::from(0.0, -2.0);
+        let inst2 = InfNum::from(-1.0, -7.0);
+        assert!(inst1 == inst2);
+    }
+
+    #[test]
+    fn inf_num_comp5() {
+        let inst1 = InfNum::from(0.0, 2.0);
+        let inst2 = InfNum::from(-1.0, -7.0);
+        assert!(inst1 > inst2);
     }
 
     #[test]
@@ -242,6 +263,20 @@ mod tests {
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
         assert!(inst.get_value(&vals) == InfNum::from(3.3, -1.0));
+    }
+
+    #[test]
+    fn function_get_coeficient() {
+        let mut inst = Function::new();
+        inst.add_variable(String::from("x"), InfNum::from(-12.34, 56.78));
+        assert!(inst.get_coeficient(String::from("x")) == InfNum::from(-12.34, 56.78));
+    }
+
+    #[test]
+    fn function_get_coeficient1() {
+        let mut inst = Function::new();
+        inst.add_variable(String::from("x"), InfNum::from(-12.34, 56.78));
+        assert!(inst.get_coeficient(String::from("y")) == InfNum::from(0.0, 0.0));
     }
 
     #[test]

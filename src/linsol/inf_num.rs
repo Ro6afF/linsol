@@ -39,10 +39,12 @@ impl Eq for InfNum {}
 
 impl Ord for InfNum {
     fn cmp(&self, other: &InfNum) -> Ordering {
-        if self.inf > other.inf {
-            Ordering::Greater
+        if self.inf > 0.0 && other.inf > 0.0 || self.inf < 0.0 && other.inf < 0.0 {
+            Ordering::Equal
         } else if self.inf < other.inf {
             Ordering::Less
+        } else if self.inf > other.inf {
+            Ordering::Greater
         } else if self.real > other.real {
             Ordering::Greater
         } else if self.real < other.real {

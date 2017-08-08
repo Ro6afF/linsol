@@ -2,22 +2,12 @@ use linsol::function::Function;
 use linsol::inf_num::InfNum;
 use std::collections::HashMap;
 
-extern crate rand;
-
 #[allow(dead_code)]
 pub enum Sign {
     Equal,
     GreaterOrEqual,
     SmallerOrEqual,
 }
-
-#[allow(dead_code)]
-pub fn get_random_name(len: usize) -> String {
-    (0..len)
-        .map(|_| (0x20u8 + (rand::random::<f32>() * 96.0) as u8) as char)
-        .collect()
-}
-
 
 #[allow(dead_code)]
 pub struct Consraint {

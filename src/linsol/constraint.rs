@@ -3,6 +3,7 @@ use linsol::inf_num::InfNum;
 use std::collections::HashMap;
 
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub enum Sign {
     Equal,
     GreaterOrEqual,
@@ -10,6 +11,7 @@ pub enum Sign {
 }
 
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub struct Consraint {
     pub left: Function,
     pub sign: Sign,

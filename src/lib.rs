@@ -7,8 +7,8 @@ mod tests {
     use linsol::constraint::Consraint;
     use linsol::constraint::Sign;
     use linsol::utilities::get_random_name;
-    //use linsol::solver::Solver;
-    //use linsol::solver::TargetValue;
+    use linsol::solver::Solver;
+    use linsol::solver::TargetValue;
     use std::collections::HashMap;
 
     #[test]
@@ -324,5 +324,201 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(0.0, 0.0));
         vals.insert(String::from("y"), InfNum::from(0.0, 1.0));
         assert!(inst.check(&vals));
+    }
+
+    #[test]
+    fn solver_cannonical_form() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(5.5, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-1.5, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-5.0, 0.0);
+        inst.constraints[len].sign = Sign::Equal;
+        inst.canonical_form();
+        let mut res = Solver::new();
+        res.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        res.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        res.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        res.target_value = TargetValue::Min;
+        res.constraints.push(Consraint::new());
+        let mut len = res.constraints.len() - 1;
+        res.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        res.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        res.constraints[len].left.add_variable(
+            inst.constraints[len].left.variables[inst.constraints[len].left.variables.len() -
+                                                     1]
+                .clone(),
+            InfNum::from(1.0, 0.0),
+        );
+        res.constraints[len].right = InfNum::from(5.5, 0.0);
+        res.constraints[len].sign = Sign::Equal;
+        res.constraints.push(Consraint::new());
+        len = res.constraints.len() - 1;
+        res.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(-1.0, 0.0),
+        );
+        res.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(-1.0, 0.0),
+        );
+        res.constraints[len].left.add_variable(
+            inst.constraints[len].left.variables[inst.constraints[len].left.variables.len() -
+                                                     1]
+                .clone(),
+            InfNum::from(1.0, 0.0),
+        );
+        res.constraints[len].right = InfNum::from(1.5, 0.0);
+        res.constraints[len].sign = Sign::Equal;
+        res.constraints.push(Consraint::new());
+        len = res.constraints.len() - 1;
+        res.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(-1.0, 0.0),
+        );
+        res.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(-1.0, 0.0),
+        );
+        res.constraints[len].right = InfNum::from(5.0, 0.0);
+        res.constraints[len].sign = Sign::Equal;
+        assert!(
+            res.target_function.coeficients == inst.target_function.coeficients &&
+                res.target_function.variables == inst.target_function.variables
+        );
+        for i in 0..res.constraints.len() {
+            for j in 0..res.constraints[i].left.variables.len() {
+                assert!(
+                    res.constraints[i].left.variables[j] == inst.constraints[i].left.variables[j]
+                );
+                assert!(
+                    res.constraints[i].left.coeficients[j] == inst.constraints[i].left.coeficients[j]
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn solver_base_form() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(5.5, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-1.5, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-5.0, 0.0);
+        inst.constraints[len].sign = Sign::Equal;
+        inst.canonical_form();
+        let out = inst.base_form();
+        assert!(out.len() == 3);
+        assert!(inst.target_function.coeficients[3] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coeficients[4] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coeficients[5] == InfNum::from(0.0, 1.0));
+        assert!(inst.constraints[0].left.coeficients[3] == InfNum::from(1.0, 0.0));
+        assert!(inst.constraints[1].left.coeficients[3] == InfNum::from(1.0, 0.0));
+        assert!(inst.constraints[2].left.coeficients[2] == InfNum::from(1.0, 0.0));
     }
 }

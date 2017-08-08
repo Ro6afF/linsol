@@ -6,19 +6,21 @@ use linsol::utilities::get_random_name;
 use std::collections::HashMap;
 
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub enum TargetValue {
     Min,
     Max,
 }
 
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub struct Solver {
     pub target_function: Function,
     pub target_value: TargetValue,
     pub constraints: Vec<Consraint>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 #[allow(dead_code)]
 enum TableCell {
     Name(String),
@@ -46,19 +48,19 @@ impl Solver {
         }
     }
 
-    fn canonical_form(&mut self) {
+    pub fn canonical_form(&mut self) {
         for i in 0..self.constraints.len() {
             let curr = &mut self.constraints[i];
             match curr.sign {
                 Sign::GreaterOrEqual => {
-                    while curr.left.add_variable(
+                    while !curr.left.add_variable(
                         get_random_name(10),
                         InfNum::from(-1.0, 0.0),
                     )
                     {}
                 }
                 Sign::SmallerOrEqual => {
-                    while curr.left.add_variable(
+                    while !curr.left.add_variable(
                         get_random_name(10),
                         InfNum::from(1.0, 0.0),
                     )
@@ -74,11 +76,11 @@ impl Solver {
         }
     }
 
-    fn base_form(&mut self) -> Vec<String> {
+    pub fn base_form(&mut self) -> Vec<String> {
         let mut res = Vec::<String>::new();
         for i in &mut self.constraints {
             let mut curr = get_random_name(10);
-            while i.left.add_variable(curr.clone(), InfNum::from(1.0, 0.0)) {
+            while !i.left.add_variable(curr.clone(), InfNum::from(1.0, 0.0)) {
                 curr = get_random_name(10);
             }
             res.push(curr.clone());
@@ -254,6 +256,10 @@ impl Solver {
     }
 
     pub fn solve(&mut self) -> Result<HashMap<String, InfNum>, String> {
+        match self.target_value {
+            TargetValue::Max => self.target_function *= InfNum::from(-1.0, 1.0),
+            _ => {}
+        }
         let /*mut*/ res = HashMap::<String, InfNum>::new();
         self.canonical_form();
         let mut table = self.get_simplex_table();

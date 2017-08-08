@@ -2,7 +2,7 @@ use std::cmp::Ordering;
 use std::ops;
 
 #[allow(dead_code)]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct InfNum {
     pub real: f64,
     pub inf: f64,

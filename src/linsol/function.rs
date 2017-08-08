@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::ops;
 
 #[allow(dead_code)]
+#[derive(Clone, Debug)]
 pub struct Function {
     pub coeficients: Vec<InfNum>,
     pub variables: Vec<String>,

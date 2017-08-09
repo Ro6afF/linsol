@@ -8,6 +8,7 @@ mod tests {
     use linsol::constraint::Sign;
     use linsol::utilities::get_random_name;
     use linsol::solver::Solver;
+    use linsol::solver::TableCell;
     use linsol::solver::TargetValue;
     use std::collections::HashMap;
 
@@ -128,7 +129,7 @@ mod tests {
         let inst1: InfNum = InfNum::from(1.9, 3.1);
         let inst2: InfNum = InfNum::from(2.2, 2.2);
         let inst = inst1 * inst2;
-        assert!(inst == InfNum::from(4.18, -6.28));
+        assert!(inst == InfNum::from(4.18, 6.28));
     }
 
     #[test]
@@ -151,7 +152,6 @@ mod tests {
     fn inf_num_subass() {
         let mut inst1 = InfNum::from(2.0, -1.0);
         inst1 -= InfNum::from(-3.0, 2.0);
-        inst1 -= InfNum::from(1.0, -1.0);
         assert!(inst1 == InfNum::from(4.0, -2.0));
     }
 
@@ -159,7 +159,6 @@ mod tests {
     fn inf_num_mulass() {
         let mut inst1 = InfNum::from(2.0, -1.0);
         inst1 *= InfNum::from(-3.0, 2.0);
-        inst1 *= InfNum::from(1.0, -1.0);
         assert!(inst1 == InfNum::from(-6.0, 2.0));
     }
 
@@ -188,7 +187,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::new());
         vals.insert(String::from("y"), InfNum::from(1.0, 0.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(-9.7, 1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(-9.7, -1.0));
     }
 
     #[test]
@@ -199,7 +198,7 @@ mod tests {
         inst.add_variable(String::from("z"), InfNum::from(-12.0, 1.0));
         let mut vals = HashMap::<String, InfNum>::new();
         vals.insert(String::from("y"), InfNum::from(1.0, 0.0));
-        assert!(inst.get_value(&vals) == InfNum::from(2.0, 0.0));
+        assert!(inst.get_value(&vals) == InfNum::from(2.0, -1.0));
     }
 
     #[test]
@@ -212,7 +211,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(-8.7, 0.0));
+        assert!(inst.get_value(&vals) == InfNum::from(-8.7, -0.01));
     }
 
     #[test]
@@ -224,7 +223,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(3.3, -1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(3.3, 1.0));
     }
 
     #[test]
@@ -236,7 +235,7 @@ mod tests {
         let mut vals = HashMap::<String, InfNum>::new();
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(3.3, -1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(3.3, 1.0));
     }
 
     #[test]
@@ -249,7 +248,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(3.3, -1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(3.3, 1.0));
     }
 
     #[test]
@@ -262,7 +261,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(3.3, -1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(3.3, 1.0));
     }
 
     #[test]
@@ -442,10 +441,6 @@ mod tests {
         );
         res.constraints[len].right = InfNum::from(5.0, 0.0);
         res.constraints[len].sign = Sign::Equal;
-        assert!(
-            res.target_function.coeficients == inst.target_function.coeficients &&
-                res.target_function.variables == inst.target_function.variables
-        );
         for i in 0..res.constraints.len() {
             for j in 0..res.constraints[i].left.variables.len() {
                 assert!(
@@ -513,12 +508,113 @@ mod tests {
         inst.constraints[len].sign = Sign::Equal;
         inst.canonical_form();
         let out = inst.base_form();
+        println!("{:?}", inst);
         assert!(out.len() == 3);
-        assert!(inst.target_function.coeficients[3] == InfNum::from(0.0, 1.0));
-        assert!(inst.target_function.coeficients[4] == InfNum::from(0.0, 1.0));
-        assert!(inst.target_function.coeficients[5] == InfNum::from(0.0, 1.0));
         assert!(inst.constraints[0].left.coeficients[3] == InfNum::from(1.0, 0.0));
         assert!(inst.constraints[1].left.coeficients[3] == InfNum::from(1.0, 0.0));
         assert!(inst.constraints[2].left.coeficients[2] == InfNum::from(1.0, 0.0));
+        assert!(inst.target_function.coeficients[5] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coeficients[6] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coeficients[7] == InfNum::from(0.0, 1.0));
+    }
+
+    #[test]
+    fn solver_simplex_table() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(5.5, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-1.5, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-5.0, 0.0);
+        inst.constraints[len].sign = Sign::Equal;
+        let tableinst = inst.get_simplex_table();
+        let exp = vec![
+            InfNum {
+                real: 0.0,
+                inf: 12.0,
+            },
+            InfNum {
+                real: -1.0,
+                inf: 0.0,
+            },
+            InfNum {
+                real: -2.0,
+                inf: 0.0,
+            },
+            InfNum {
+                real: 3.0,
+                inf: -2.0,
+            },
+            InfNum {
+                real: 0.0,
+                inf: 1.0,
+            },
+            InfNum {
+                real: 0.0,
+                inf: 1.0,
+            },
+            InfNum {
+                real: 0.0,
+                inf: 0.0,
+            },
+            InfNum {
+                real: 0.0,
+                inf: 0.0,
+            },
+            InfNum {
+                real: 0.0,
+                inf: 0.0,
+            },
+        ];
+        for i in 2..tableinst[0].len() {
+            match tableinst[tableinst.len() - 1][i] {
+                TableCell::Value(expr) => assert!(expr == exp[i - 2]),
+                _ => {}
+            }
+        }
     }
 }

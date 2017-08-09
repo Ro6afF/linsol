@@ -22,10 +22,32 @@ pub struct Solver {
 
 #[derive(Clone, Debug)]
 #[allow(dead_code)]
-enum TableCell {
+pub enum TableCell {
     Name(String),
     Value(InfNum),
 }
+
+impl PartialEq for TableCell {
+    fn eq(&self, other: &TableCell) -> bool {
+        match self {
+            &TableCell::Name(ref x) => {
+                match other {
+                    &TableCell::Name(ref y) => return x == y,
+                    _ => {}
+                }
+            }
+            &TableCell::Value(ref x) => {
+                match other {
+                    &TableCell::Value(ref y) => return x == y,
+                    _ => {}
+                }
+            }
+        }
+        false
+    }
+}
+
+impl Eq for TableCell {}
 
 #[allow(dead_code)]
 type SimplexTable = Vec<Vec<TableCell>>;
@@ -51,27 +73,36 @@ impl Solver {
     pub fn canonical_form(&mut self) {
         for i in 0..self.constraints.len() {
             let curr = &mut self.constraints[i];
+            let mut name = get_random_name(10);
             match curr.sign {
                 Sign::GreaterOrEqual => {
                     while !curr.left.add_variable(
-                        get_random_name(10),
+                        name.clone(),
                         InfNum::from(-1.0, 0.0),
                     )
-                    {}
+                    {
+                        name = get_random_name(10);
+                    }
+                    self.target_function.add_variable(
+                        name,
+                        InfNum::from(0.0, 0.0),
+                    );
                 }
                 Sign::SmallerOrEqual => {
-                    while !curr.left.add_variable(
-                        get_random_name(10),
-                        InfNum::from(1.0, 0.0),
-                    )
-                    {}
+                    while !curr.left.add_variable(name.clone(), InfNum::from(1.0, 0.0)) {
+                        name = get_random_name(10);
+                    }
+                    self.target_function.add_variable(
+                        name,
+                        InfNum::from(0.0, 0.0),
+                    );
                 }
                 _ => {}
             }
             curr.sign = Sign::Equal;
             if curr.right < InfNum::from(0.0, 0.0) {
-                curr.right *= InfNum::from(-1.0, 1.0);
-                curr.left *= InfNum::from(-1.0, 1.0);
+                curr.right *= InfNum::from(-1.0, 0.0);
+                curr.left *= InfNum::from(-1.0, 0.0);
             }
         }
     }
@@ -92,7 +123,8 @@ impl Solver {
         res
     }
 
-    fn get_simplex_table(&mut self) -> SimplexTable {
+    pub fn get_simplex_table(&mut self) -> SimplexTable {
+        self.canonical_form();
         let bases = self.base_form();
         let mut res = SimplexTable::new();
         for i in 0..bases.len() + 3 {
@@ -108,8 +140,8 @@ impl Solver {
         res[1][1] = TableCell::Name(String::from("Vb"));
         res[1][2] = TableCell::Name(String::from("b"));
         for i in 0..self.target_function.variables.len() {
-            res[0][i + 2] = TableCell::Value(self.target_function.coeficients[i]);
-            res[1][i + 2] = TableCell::Name(self.target_function.variables[i].clone());
+            res[0][i + 3] = TableCell::Value(self.target_function.coeficients[i]);
+            res[1][i + 3] = TableCell::Name(self.target_function.variables[i].clone());
         }
         for i in 0..bases.len() {
             res[i + 2][0] = TableCell::Value(InfNum::from(0.0, 1.0));
@@ -119,8 +151,8 @@ impl Solver {
 
         for i in 0..bases.len() {
             for j in 0..self.target_function.variables.len() {
-                res[i + 2][j + 2] = TableCell::Value(self.constraints[i].left.get_coeficient(
-                    self.target_function.variables[i].clone(),
+                res[i + 2][j + 3] = TableCell::Value(self.constraints[i].left.get_coeficient(
+                    self.target_function.variables[j].clone(),
                 ));
             }
         }
@@ -128,9 +160,9 @@ impl Solver {
         for i in 0..self.target_function.variables.len() + 1 {
             let mut resu = InfNum::from(0.0, 0.0);
             for j in 0..bases.len() {
-                match res[j + 2][i + 1] {
+                match res[j + 2][i + 2] {
                     TableCell::Value(x) => {
-                        match res[j + 3][0] {
+                        match res[j + 2][0] {
                             TableCell::Value(y) => resu += x * y,
                             _ => {}
                         }
@@ -142,7 +174,7 @@ impl Solver {
                 TableCell::Value(x) => resu -= x,
                 _ => {}
             }
-            res[bases.len() + 3][i + 2] = TableCell::Value(resu);
+            res[bases.len() + 2][i + 2] = TableCell::Value(resu);
         }
         res
     }
@@ -235,16 +267,18 @@ impl Solver {
                     TableCell::Value(x) => {
                         match table[i + 3][selectionv] {
                             TableCell::Value(y) => coeficient = y / x,
-                            _ => {coeficient = InfNum::new()}
+                            _ => coeficient = InfNum::new(),
                         }
                     }
-                    _ => {coeficient = InfNum::new()}
+                    _ => coeficient = InfNum::new(),
                 }
                 for j in 0..table[i].len() - 3 {
                     match table[i][j] {
                         TableCell::Value(x) => {
                             match table[selectionb][j] {
-                                TableCell::Value(y) => table[i][j] = TableCell::Value(x - coeficient * y),
+                                TableCell::Value(y) => {
+                                    table[i][j] = TableCell::Value(x - coeficient * y)
+                                }
                                 _ => {}
                             }
                         }

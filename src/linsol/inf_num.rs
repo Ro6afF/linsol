@@ -26,20 +26,21 @@ impl InfNum {
 
 impl PartialEq for InfNum {
     fn eq(&self, other: &InfNum) -> bool {
-        if self.inf != 0.0 && other.inf != 0.0 {
+        if (self.inf > 0.0 && other.inf > 0.0) || (self.inf < 0.0 && other.inf < 0.0) {
             true
-        } else if self.inf == other.inf {
-            self.real.eq(&other.real)
+        } else if self.inf == 0.0 && other.inf == 0.0 {
+            self.real == other.real
         } else {
             false
         }
     }
 }
+
 impl Eq for InfNum {}
 
 impl Ord for InfNum {
     fn cmp(&self, other: &InfNum) -> Ordering {
-        if self.inf > 0.0 && other.inf > 0.0 || self.inf < 0.0 && other.inf < 0.0 {
+        if (self.inf > 0.0 && other.inf > 0.0) || (self.inf < 0.0 && other.inf < 0.0) {
             Ordering::Equal
         } else if self.inf < other.inf {
             Ordering::Less
@@ -104,7 +105,7 @@ impl ops::Mul<InfNum> for InfNum {
     fn mul(self, other: InfNum) -> InfNum {
         InfNum {
             real: self.real * other.real,
-            inf: self.inf * other.inf,
+            inf: self.inf * other.inf + self.real * other.inf + self.inf * other.real,
         }
     }
 }
@@ -112,8 +113,8 @@ impl ops::Mul<InfNum> for InfNum {
 impl ops::MulAssign<InfNum> for InfNum {
     fn mul_assign(&mut self, other: InfNum) {
         *self = InfNum {
-            inf: self.inf * other.inf,
             real: self.real * other.real,
+            inf: self.inf * other.inf + self.real * other.inf + self.inf * other.real,
         };
     }
 }

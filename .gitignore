@@ -1,5 +1,13 @@
 .vagrant
 Cargo.lock
 target
-doc
+*.aux
+*.fls
+*.toc
+*.log
+*.nav
+*.gz
+*.snm
+*.fdb_latexmk
+*.out
 tmp.rs

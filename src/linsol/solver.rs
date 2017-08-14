@@ -4,6 +4,7 @@ use linsol::constraint::Sign;
 use linsol::constraint::Consraint;
 use linsol::utilities::get_random_name;
 use std::collections::HashMap;
+use std::f64;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -140,7 +141,7 @@ impl Solver {
         res[1][1] = TableCell::Name(String::from("Vb"));
         res[1][2] = TableCell::Name(String::from("b"));
         for i in 0..self.target_function.variables.len() {
-            res[0][i + 3] = TableCell::Value(self.target_function.coeficients[i]);
+            res[0][i + 3] = TableCell::Value(self.target_function.coefficients[i]);
             res[1][i + 3] = TableCell::Name(self.target_function.variables[i].clone());
         }
         for i in 0..bases.len() {
@@ -151,7 +152,7 @@ impl Solver {
 
         for i in 0..bases.len() {
             for j in 0..self.target_function.variables.len() {
-                res[i + 2][j + 3] = TableCell::Value(self.constraints[i].left.get_coeficient(
+                res[i + 2][j + 3] = TableCell::Value(self.constraints[i].left.get_coefficient(
                     self.target_function.variables[j].clone(),
                 ));
             }
@@ -179,8 +180,8 @@ impl Solver {
         res
     }
 
-    fn check_optimality(&self, table: &SimplexTable) -> bool {
-        for i in 0..table[0].len() {
+    pub fn check_optimality(&self, table: &SimplexTable) -> bool {
+        for i in 0..table[0].len() - 2 {
             match table[table.len() - 1][i + 2] {
                 TableCell::Value(x) => {
                     if x > InfNum::from(0.0, 0.0) {
@@ -193,13 +194,13 @@ impl Solver {
         true
     }
 
-    fn check_limitlessness(&self, table: &SimplexTable) -> bool {
-        for i in 0..table[0].len() {
+    pub fn check_limitlessness(&self, table: &SimplexTable) -> bool {
+        for i in 0..table[0].len() - 2 {
             match table[table.len() - 1][i + 2] {
                 TableCell::Value(x) => {
                     if x > InfNum::from(0.0, 0.0) {
                         let mut curr = false;
-                        for j in 0..table.len() {
+                        for j in 0..table.len() - 3 {
                             match table[j + 2][i + 2] {
                                 TableCell::Value(y) => {
                                     if y > InfNum::from(0.0, 0.0) {
@@ -221,7 +222,7 @@ impl Solver {
         false
     }
 
-    fn improve_table(&self, table: &mut SimplexTable) {
+    pub fn improve_table(&self, table: &mut SimplexTable) {
         let mut selectionv: usize = 0;
         let mut maxdv = InfNum::from(0.0, -1.0);
         for i in 0..table[table.len() - 1].len() - 3 {
@@ -237,14 +238,16 @@ impl Solver {
         }
         let mut selectionb: usize = 0;
         let mut minbr = InfNum::from(0.0, 1.0);
-        for i in 0..table.len() {
-            match table[i + 3][2] {
+        for i in 0..table.len() - 3 {
+            match table[i + 2][2] {
                 TableCell::Value(x) => {
-                    match table[i + 3][selectionv] {
+                    match table[i + 2][selectionv] {
                         TableCell::Value(y) => {
-                            if x / y < minbr {
-                                minbr = x / y;
-                                selectionb = i;
+                            if y > InfNum::from(0.0, 0.0) {
+                                if x / y < minbr {
+                                    minbr = x / y;
+                                    selectionb = i + 2;
+                                }
                             }
                         }
                         _ => {}
@@ -260,24 +263,24 @@ impl Solver {
         table[1][selectionv] = table[selectionb][1].clone();
         table[selectionb][1] = tmp;
 
-        for i in 0..table.len() - 3 {
-            if i != selectionb {
-                let coeficient;
+        for i in 0..table.len() - 2 {
+            if i + 2 != selectionb {
+                let mut coefficient = InfNum::from(1.1, 1.0);
                 match table[selectionb][selectionv] {
                     TableCell::Value(x) => {
-                        match table[i + 3][selectionv] {
-                            TableCell::Value(y) => coeficient = y / x,
-                            _ => coeficient = InfNum::new(),
+                        match table[i + 2][selectionv] {
+                            TableCell::Value(y) => coefficient = y / x,
+                            _ => {}
                         }
                     }
-                    _ => coeficient = InfNum::new(),
+                    _ => {}
                 }
                 for j in 0..table[i].len() - 3 {
-                    match table[i][j] {
+                    match table[i + 2][j + 3] {
                         TableCell::Value(x) => {
-                            match table[selectionb][j] {
+                            match table[selectionb][j + 3] {
                                 TableCell::Value(y) => {
-                                    table[i][j] = TableCell::Value(x - coeficient * y)
+                                    table[i + 2][j + 3] = TableCell::Value(x - coefficient * y)
                                 }
                                 _ => {}
                             }
@@ -294,14 +297,28 @@ impl Solver {
             TargetValue::Max => self.target_function *= InfNum::from(-1.0, 1.0),
             _ => {}
         }
-        let /*mut*/ res = HashMap::<String, InfNum>::new();
         self.canonical_form();
         let mut table = self.get_simplex_table();
+        let mut plok = String::new();
         while !self.check_optimality(&table) {
+            plok.push_str(&format!("{:?}\n----------------------------\n", table));
             if self.check_limitlessness(&table) {
+                println!("{}", plok);
                 return Result::Err(String::from("Function is unlimited!"));
             }
             self.improve_table(&mut table);
+        }
+        let mut res = HashMap::<String, InfNum>::new();
+        for i in 0..table.len() {
+            match table[i][1].clone() {
+                TableCell::Name(x) => {
+                    let usless_shit = match table[i][2] {
+                        TableCell::Value(y) => res.insert(x, y),
+                        _ => res.insert(String::from("OOPS"), InfNum::from(f64::NAN, f64::NAN)),
+                    };
+                }
+                _ => {}
+            }
         }
         Result::Ok(res)
     }

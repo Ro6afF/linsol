@@ -137,7 +137,8 @@ mod tests {
         let inst1: InfNum = InfNum::from(1.9, 3.1);
         let inst2: InfNum = InfNum::from(0.1, -10.0);
         let inst = inst1 / inst2;
-        assert!(inst == InfNum::from(19.0, -0.31));
+        println!("{:?}", inst);
+        assert!(inst == InfNum::from(-0.31, 0.0));
     }
 
     #[test]
@@ -165,8 +166,8 @@ mod tests {
     #[test]
     fn inf_num_divass() {
         let mut inst1 = InfNum::from(2.0, -1.0);
-        inst1 /= InfNum::from(-2.0, 2.0);
-        inst1 /= InfNum::from(1.0, -1.0);
+        inst1 /= InfNum::from(-2.0, 0.0);
+        println!("{:?}", inst1);
         assert!(inst1 == InfNum::from(-1.0, 0.5));
     }
 
@@ -211,7 +212,7 @@ mod tests {
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(-8.7, -0.01));
+        assert!(inst.get_value(&vals) == InfNum::from(-8.7, 0.0));
     }
 
     #[test]
@@ -227,11 +228,11 @@ mod tests {
     }
 
     #[test]
-    fn function_change_coeficient() {
+    fn function_change_coefficient() {
         let mut inst = Function::new();
         inst.add_variable(String::from("x"), InfNum::from(1.0, 0.0));
         inst.add_variable(String::from("y"), InfNum::from(1.0, 0.0));
-        inst.change_coeficient(String::from("y"), InfNum::from(2.3, -1.0));
+        inst.change_coefficient(String::from("y"), InfNum::from(2.3, -1.0));
         let mut vals = HashMap::<String, InfNum>::new();
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
@@ -256,26 +257,25 @@ mod tests {
         let mut inst = Function::new();
         inst.add_variable(String::from("x"), InfNum::from(2.0, 0.0));
         inst.add_variable(String::from("y"), InfNum::from(4.6, -1.0));
-        inst /= InfNum::from(2.0, 1.0);
+        inst /= InfNum::from(2.0, 0.0);
         let mut vals = HashMap::<String, InfNum>::new();
         vals.insert(String::from("x"), InfNum::from(1.0, 1.0));
         vals.insert(String::from("y"), InfNum::from(1.0, 1.0));
-        vals.insert(String::from("z"), InfNum::from(1.0, 1.0));
-        assert!(inst.get_value(&vals) == InfNum::from(3.3, 1.0));
+        assert!(inst.get_value(&vals) == InfNum::from(3.3, 0.5));
     }
 
     #[test]
-    fn function_get_coeficient() {
+    fn function_get_coefficient() {
         let mut inst = Function::new();
         inst.add_variable(String::from("x"), InfNum::from(-12.34, 56.78));
-        assert!(inst.get_coeficient(String::from("x")) == InfNum::from(-12.34, 56.78));
+        assert!(inst.get_coefficient(String::from("x")) == InfNum::from(-12.34, 56.78));
     }
 
     #[test]
-    fn function_get_coeficient1() {
+    fn function_get_coefficient1() {
         let mut inst = Function::new();
         inst.add_variable(String::from("x"), InfNum::from(-12.34, 56.78));
-        assert!(inst.get_coeficient(String::from("y")) == InfNum::from(0.0, 0.0));
+        assert!(inst.get_coefficient(String::from("y")) == InfNum::from(0.0, 0.0));
     }
 
     #[test]
@@ -447,7 +447,7 @@ mod tests {
                     res.constraints[i].left.variables[j] == inst.constraints[i].left.variables[j]
                 );
                 assert!(
-                    res.constraints[i].left.coeficients[j] == inst.constraints[i].left.coeficients[j]
+                    res.constraints[i].left.coefficients[j] == inst.constraints[i].left.coefficients[j]
                 );
             }
         }
@@ -510,12 +510,12 @@ mod tests {
         let out = inst.base_form();
         println!("{:?}", inst);
         assert!(out.len() == 3);
-        assert!(inst.constraints[0].left.coeficients[3] == InfNum::from(1.0, 0.0));
-        assert!(inst.constraints[1].left.coeficients[3] == InfNum::from(1.0, 0.0));
-        assert!(inst.constraints[2].left.coeficients[2] == InfNum::from(1.0, 0.0));
-        assert!(inst.target_function.coeficients[5] == InfNum::from(0.0, 1.0));
-        assert!(inst.target_function.coeficients[6] == InfNum::from(0.0, 1.0));
-        assert!(inst.target_function.coeficients[7] == InfNum::from(0.0, 1.0));
+        assert!(inst.constraints[0].left.coefficients[3] == InfNum::from(1.0, 0.0));
+        assert!(inst.constraints[1].left.coefficients[3] == InfNum::from(1.0, 0.0));
+        assert!(inst.constraints[2].left.coefficients[2] == InfNum::from(1.0, 0.0));
+        assert!(inst.target_function.coefficients[5] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coefficients[6] == InfNum::from(0.0, 1.0));
+        assert!(inst.target_function.coefficients[7] == InfNum::from(0.0, 1.0));
     }
 
     #[test]
@@ -616,5 +616,440 @@ mod tests {
                 _ => {}
             }
         }
+    }
+
+    #[test]
+    fn solver_check_optimality() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(5.5, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-1.5, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-5.0, 0.0);
+        inst.constraints[len].sign = Sign::Equal;
+        let tableinst = inst.get_simplex_table();
+        assert!(!inst.check_optimality(&tableinst));
+    }
+
+    #[test]
+    fn solver_check_optimality1() {
+        let table = vec![
+            vec![
+                TableCell::Value(InfNum::from(-1.0, 0.0)),
+                TableCell::Value(InfNum::from(-2.0, 0.0)),
+                TableCell::Value(InfNum::from(0.0, 0.0)),
+                TableCell::Value(InfNum::from(0.0, -1.0)),
+            ],
+        ];
+        let inst = Solver::new();
+        assert!(inst.check_optimality(&table));
+    }
+
+    #[test]
+    fn solver_check_limitlessness() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("y"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("z"),
+            InfNum::from(-3.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(5.5, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-1.5, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("y"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("z"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(-5.0, 0.0);
+        inst.constraints[len].sign = Sign::Equal;
+        let tableinst = inst.get_simplex_table();
+        assert!(!inst.check_limitlessness(&tableinst));
+    }
+
+    #[test]
+    fn solver_check_limitlessness1() {
+        let inst = Solver::new();
+        let table = vec![
+            vec![
+                TableCell::Name(String::from("MIN")),
+                TableCell::Name(String::from("MIN")),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 2.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 3.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.0,
+                }),
+            ],
+            vec![
+                TableCell::Name(String::from("Cb")),
+                TableCell::Name(String::from("Vb")),
+                TableCell::Name(String::from("b")),
+                TableCell::Name(String::from("x")),
+                TableCell::Name(String::from("y")),
+                TableCell::Name(String::from("z")),
+                TableCell::Name(String::from("}=j*4zv\u{7f}4V")),
+                TableCell::Name(String::from("u0$(L8-8Nh")),
+                TableCell::Name(String::from("P=},. 09y0")),
+            ],
+            vec![
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Name(String::from("}=j*4zv\u{7f}4V")),
+                TableCell::Value(InfNum {
+                    real: -0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -1.0,
+                    inf: -1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+            ],
+            vec![
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Name(String::from("u0$(L8-8Nh")),
+                TableCell::Value(InfNum {
+                    real: -0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: -1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -1.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+            ],
+            vec![
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 1.10,
+                }),
+                TableCell::Name(String::from("P=},. 09y0")),
+                TableCell::Value(InfNum {
+                    real: -0.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -1.0,
+                    inf: 1.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 1.0,
+                    inf: 0.0,
+                }),
+            ],
+            vec![
+                TableCell::Name(String::from("UNDEFINED")),
+                TableCell::Name(String::from("UNDEFINED")),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 3.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -1.0,
+                    inf: 4.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -2.0,
+                    inf: 2.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: -3.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+                TableCell::Value(InfNum {
+                    real: 0.0,
+                    inf: 0.0,
+                }),
+            ],
+        ];
+        assert!(inst.check_limitlessness(&table));
+    }
+
+    #[test]
+    fn solver_imorive_table() {
+        let mut inst = Solver::new();
+        inst.target_function = Function::new();
+        inst.target_function.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        inst.target_function.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.target_value = TargetValue::Min;
+        inst.constraints.push(Consraint::new());
+        let mut len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x1"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(1.0, 0.0);
+        inst.constraints[len].sign = Sign::GreaterOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x1"),
+            InfNum::from(3.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("x2"),
+            InfNum::from(2.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(3.0, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        inst.constraints.push(Consraint::new());
+        len = inst.constraints.len() - 1;
+        inst.constraints[len].left.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        inst.constraints[len].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        inst.constraints[len].right = InfNum::from(1.0, 0.0);
+        inst.constraints[len].sign = Sign::SmallerOrEqual;
+        let mut table = inst.get_simplex_table();
+        inst.improve_table(&mut table);
+        println!("{:?}", table);
+        /*for i in 0..table.len() {
+            for j in 0..table[0].len() {
+                match table[i][j] {
+                    TableCell::Value(_) => assert!(table[i][j] == expected[i][j]),
+                    _ => {}
+                }
+            }
+        }*/
+
+    }
+
+    #[test]
+    fn solver_solve() {
+        let mut solver = Solver::new();
+        solver.target_function.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        solver.target_function.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.target_value = TargetValue::Min;
+        solver.constraints.push(Consraint::new());
+        solver.constraints[0].left.add_variable(
+            String::from("x1"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[0].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[0].sign = Sign::GreaterOrEqual;
+        solver.constraints[0].right = InfNum::from(1.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[1].left.add_variable(
+            String::from("x1"),
+            InfNum::from(-3.0, 0.0),
+        );
+        solver.constraints[1].left.add_variable(
+            String::from("x2"),
+            InfNum::from(2.0, 0.0),
+        );
+        solver.constraints[1].sign = Sign::SmallerOrEqual;
+        solver.constraints[1].right = InfNum::from(3.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[2].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[2].sign = Sign::SmallerOrEqual;
+        solver.constraints[2].right = InfNum::from(3.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[3].left.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        solver.constraints[3].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[3].sign = Sign::SmallerOrEqual;
+        solver.constraints[3].right = InfNum::from(1.0, 0.0);
+        println!("{:?}", solver.solve());
+        assert!(1 == 0);
     }
 }

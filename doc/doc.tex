@@ -20,8 +20,14 @@
 	urlcolor={black}
 }
 
-\title{Linear solver with infinite numbers (Linsol)}
-\author{Dimo Chanev}
+\title{Linear solver with infinity numbers (Linsol)}
+\author{
+			\begin{tabular}{rl}
+				\normalsize{Author:    } & \normalsize{Dimo Chanev} \\
+				\scriptsize{Supervisiors:     } & \scriptsize{Doychin Boyadzhiev}\\
+				                                & \scriptsize{Emil Kelevejiev}
+			\end{tabular}
+		}
 
 \begin{document}
 	\maketitle
@@ -31,13 +37,13 @@
 
   %	\newpage
   %  \begin{abstract}
-  %      Linsol is an library for minimizing and maximizing linear functions with linear constraints. It uses the new type of numbers called "infinite numbers".
+  %      Linsol is an library for minimizing and maximizing linear functions with linear constraints. It uses the new type of numbers called "infinity numbers".
   %  \end{abstract}
     
     \newpage
 
 	\section{Introduction}
-		\subsection{Introduction to the infinite numbers}
+		\subsection{Introduction to the infinity numbers}
 			\large{\textbf{Let's try to imagine that there is an absolute infinity ($\infty$) (not infinity as a limit but true infinity).}} \\\\
 			And let's thing a bit what the common reason says:
 			\begin{itemize}
@@ -45,41 +51,41 @@
 				\item Infinity multiplied by any number is $\pm$ infinity
 			\end{itemize}
 			So what is the result of $0\infty$? This is a contradiction so it is undefined? \\
-			Here the infinite numbers come to help us. What is infinite number you might ask? \\
-			Let's define \textbf{infinite number}. It is a number represented as
-			$$(a; b) = a + b\infty, where\ a \in \mathbb{R}, b \in \{-1, 0, 1\}$$
+			Here the infinity numbers come to help us. What is infinity number you might ask? \\
+			Let's define \textbf{infinity number}. It is a number represented as
+			$$ (a; b) = a + b\infty, where\ a \in \mathbb{R}, b \in \{-1, 0, 1\}$$
 			\textbf{$\infty$} is just a symbol, representing the intuitive concept of infinity.\\\\
 			In the above notation:\\
 			\textbf{"a"} is called coefficient for the real part.\\
 			\textbf{"b"} is called the coefficient for the infinity part.\\\\
-			We introduce this relations($>\ <\ =\ \neq$) definig that:\\
+			We introduce this relations ($>\ <\ =\ \neq$) definig that:\\
 			$$for\ every\ x,\ y \in \mathbb{R}$$
-			$$(x; 1) > (y; 0)$$
-			$$(x; 1) > (y; -1)$$
-			$$(x; 0) > (y; -1)$$
-			$$(x; -1) = (y; -1)$$
-			$$(x; 1) = (y; 1)$$
-			$$(x; 0) \neq (y; 0),\ where\ x \neq y$$\\
+			$$ (x; 1) > (y; 0)$$
+			$$ (x; 1) > (y; -1)$$
+			$$ (x; 0) > (y; -1)$$
+			$$ (x; -1) = (y; -1)$$
+			$$ (x; 1) = (y; 1)$$
+			$$ (x; 0) \neq (y; 0),\ where\ x \neq y$$\\
 			\newpage
 			Let's define the basic mathematical operations with them:
 			\begin{itemize}
-				\item Addition: $$(a; b) + (c; d) = a + b\infty + c + d\infty = a + c + (b + d)\infty = (a + c; b + d)$$
-				\item Subtraction: $$(a; b) - (c; d) = a + b\infty - c - d\infty = a - c + (b - d)\infty = (a - c; b - d)$$
-				\item Multiplication: $$(a; b) \times (c; d) = (a + b\infty) \times (c + d\infty) = ac + ad\infty + bc\infty + bd{\infty}^2 =$$$$ ac + ad\infty + bc\infty + bd\infty = ac + (ad + bc + bd)\infty = (ac; ad + bc + bd)$$
-				\item Division: $$\frac{(a; b)}{(c; d)} = \frac{a + b\infty}{c + d\infty} = \frac{b}{d} = (\frac{b}{d}; 0) , d \neq 0$$
-				                $$\frac{(a; b)}{(c; 0)} = \frac{a + b\infty}{c} = \frac{a}{c} + \frac{b}{c}\infty = (\frac{a}{c}; \frac{b}{c}) , d = 0$$
+				\item Addition: $$ (a; b) + (c; d) = a + b\infty + c + d\infty = a + c + (b + d)\infty = (a + c; b + d)$$
+				\item Subtraction: $$ (a; b) - (c; d) = a + b\infty - c - d\infty = a - c + (b - d)\infty = (a - c; b - d)$$
+				\item Multiplication: $$ (a; b) \times (c; d) = (a + b\infty) \times (c + d\infty) = ac + ad\infty + bc\infty + bd{\infty}^2 =$$$$ ac + ad\infty + bc\infty + bd\infty = ac + (ad + bc + bd)\infty = (ac; ad + bc + bd)$$
+				\item Division: $$\frac{ (a; b)}{ (c; d)} = \frac{a + b\infty}{c + d\infty} = \frac{b}{d} = (\frac{b}{d}; 0) , d \neq 0$$
+				                $$\frac{ (a; b)}{ (c; 0)} = \frac{a + b\infty}{c} = \frac{a}{c} + \frac{b}{c}\infty = (\frac{a}{c}; \frac{b}{c}) , d = 0$$
      		\end{itemize}
 			\Large{\textbf{Important remark: }}
 			\begin{itemize}
-				\item When $b>0$ in $(a; b)$ we substitude $b$ by $1$
-				\item When $b<0$ in $(a; b)$ we substitude $b$ by $-1$
+				\item When $b>0$ in $ (a; b)$ we substitude $b$ by $1$
+				\item When $b<0$ in $ (a; b)$ we substitude $b$ by $-1$
 			\end{itemize}
 			\textbf{Some examples:}
-			$$(1; 0) + (2; 1) = (3, 1)$$
-			$$(1.3; -1) - (2; 1) = (-0.7; -2) = (3, -1)$$
-			$$(10; -1) \times (0.1; 1) = (1; 8.9) = (1, 1)$$
-			$$(10; -1) / (0.1; 1) = (-1, 0)$$
-			$$(10; -1) / (0.1; 0) = (1, -0.1) = (1, -1)$$
+			$$ (1; 0) + (2; 1) = (3, 1)$$
+			$$ (1.3; -1) - (2; 1) = (-0.7; -2) = (3, -1)$$
+			$$ (10; -1) \times (0.1; 1) = (1; 8.9) = (1, 1)$$
+			$$ (10; -1) / (0.1; 1) = (-1, 0)$$
+			$$ (10; -1) / (0.1; 0) = (1, -0.1) = (1, -1)$$
 		\subsection{Introduction to Linsol}
 			Linsol is a library written in  \href{https://www.rust-lang.org/en-US/}{Rust programming language} which implements the algorithm of the \href{https://en.wikipedia.org/wiki/Simplex_algorithm}{Simplex method} to find the minimum or maximum of a linear function with given linear constraints.
 			Let's describe the algorithm for finding the minimum of the function:\\
@@ -87,10 +93,10 @@
 			\textbf{$ ax + by \geq c$ can be written as $ax + by + z = c$ and z is inserted in the target function with coefficient 0;\\
 			$ ax + by \leq c$ can be written as $ax + by - z = c$ and z is inserted in the target function with coefficient 0;\\
 			$ ax + by = -c$ can be written as $-ax - by = c$}\\
-			After the canonical form is applied to the problem we must apply the base form(the M form) which has the following condition to be done:\\
+			After the canonical form is applied to the problem we must apply the base form (the M form) which has the following condition to be done:\\
 			\textbf{"In each constraint there must be a variable with coefficient 1 and coefficient 0 in the other constraints."}\\
-			The most common way of doing this is to add a variable with coneficient 1 for each of the contraint and with coefficient 0 for all the others and put it with coefficient $\infty$ in the target function. Here the infinity numbers come to help to store the data and process it easyly.\\
-			After that we construct the simplex table, which in every is stored an constraint like coefficients for the variables i in in all the others(if a variable is not in the constraint it participates there with coefficient 0). Here we assume that the coefficients are the values of the variables. Then we calculate the deltas:
+			The most common way of doing this is to add a variable with coefficient 1 for each of the contraint and with coefficient 0 for all the others and put it with coefficient $\infty$ in the target function. Here the infinity numbers come to help to store the data and process it easily.\\
+			After that we construct the simplex table, which in every is stored an constraint like coefficients for the variables in all the others (if a variable is not in the constraint it participates there with coefficient 0). Here we assume that the coefficients are the values of the variables. Then we calculate the deltas:
 			$$\Delta_V = \displaystyle\sum_{i=0}^{n} V_i b_i$$
 			$$where\ n\ is\ the\ number\ of\ constraints\ numbered\ from\ 0$$
 			$$V_i\ is\ the\ value\ of\ the\ variable\ V\ in\ the\ constraint\ with\ number\ i$$
@@ -101,7 +107,7 @@
 			After that we check the limitlessness condition which is:
 			$$\exists\Delta_V > 0\ where\ \nexists V > 0$$
 			If it is true the minimal value of the target function with the given constraints is $-\infty$.\\
-			If the both conditions aren't met we can reconstruct the table to get closer to the result(move in a neighbouring point in the polygon of intersection) as follows:\\
+			If the both conditions aren't met we can reconstruct the table to get closer to the result (move in a neighbouring point in the polygon of intersection) as follows:\\
 			$$Select\ V\ where\ \Delta_V \to max\ :this\ variable\ will\ get\ into\ the\ bases$$
 			$$Select\ i\ where\ \frac{b_i}{\alpha_{iV}} \to min\ ;\ \alpha_{iV} > 0\ :this\ variable\ will\ get\ out\ the\ bases$$
 			The variables have already been in the base must have $\Delta=0$ and $\alpha_{iV} = 1$ and the other $\alpha_{qV} = 0$. So we must make some transformations to do that
@@ -299,91 +305,94 @@
 %			\end{center}
 			\subsection{InfNum}
 				\Large{InfNum is the type that implements the infinity numbers.}
-				\subsubsection{new() -$>$ InfNum}
+				\subsubsection{new () -$>$ InfNum}
 					Returns the infinity number (0.0; 0.0).
-				\subsubsection{from(real: f64, inf: f64) -$>$ InfNum}
+				\subsubsection{from (real: f64, inf: f64) -$>$ InfNum}
 					Returns the infinity number (real; inf).
 				\subsubsection{Redefining +, -, *, /}
 					Returns the result of the corresponding operation.\\Example:\\
-					\large{\textbf{let a = InfNum::from(1.2, 1.0);\\
-						let b = InfNum::from(2.2, 1.0);\\
-						let c = a + b; // c = InfNum::from(3.4, 1.0)}}
+					\large{\textbf{let a = InfNum::from (1.2, 1.0);\\
+						let b = InfNum::from (2.2, 1.0);\\
+						let c = a + b; // c = InfNum::from (3.4, 1.0)}}
 				\subsubsection{Redefining +=, -=, *=, /=}
 					Sets the results from the corresponding operation to the left variable.\\Example:\\
-					\large{\textbf{let mut a = InfNum::from(1.2, 1.0);\\
-						a -= InfNum::from(2.2, 1.0); // a = InfNum::from(-1.0, 0.0)}}
+					\large{\textbf{let mut a = InfNum::from (1.2, 1.0);\\
+						a -= InfNum::from (2.2, 1.0); // a = InfNum::from (-1.0, 0.0)}}
 
 			\subsection{Function}
-				\Large{Function is the type that implements a functions with infinity numbers.}
-				\subsubsection{new()-$>$ Function}
-					Returns a basic function(no variables and coefficients).
-				\subsubsection{add\_variable(name: String, coefficient: InfNum) -$>$ bool}
+				\Large{Function is the type that implements a function with infinity numbers.}
+				\subsubsection{new ()-$>$ Function}
+					Returns a basic function (no variables and coefficients).
+				\subsubsection{add\_variable (name: String, coefficient: InfNum) -$>$ bool}
 					Pushes a variable and its' coefficient to the function.
-				\subsubsection{change\_coefficient(name: String, new\_coefficient: InfNum)}
-					Sets the coefficient in front of the variable
-				\subsubsection{get\_coefficient(name: String) -$>$ InfNum}
+				\subsubsection{change\_coefficient (name: String, new\_coefficient: InfNum)}
+					Sets the coefficient in front of the variable.
+				\subsubsection{get\_coefficient (name: String) -$>$ InfNum}
 					Returns the coefficient in front of the variable.\\Example:\\
-					\large{\textbf{let mut a = Function::new();\\
-						a.add\_variable(String::from("x"), InfNum::from(1.0, 0.0));\\
-						a.add\_variable(String::from("y"), InfNum::from(-1.0, 0.0));\\
-						a.change\_coefficient(String::from("y"), InfNum::from(-2.0, 0.0));\\
-						let c = a.get\_coefficient(String::from("x")); // InfNum::from(1.0, 0.0)\\
-						let d = a.get\_coefficient(String::from("y")); // InfNum::from(-2.0, 0.0)\\}}
-				\subsubsection{get\_value(values: \&$HashMap<String, InfNum>$)-$>$ InfNum}
-					Calculates and gives the result formed my replacing the variables as descripbed in the HashHap.\\Example:\\
-					\large{\textbf{let mut inst = Function::new();\\
-        inst.add\_variable(String::from("y"), InfNum::from(2.0, -1.0));\\
-        let mut vals = HashMap::$<String, InfNum>$::new();\\
-        vals.insert(String::from("y"), InfNum::from(1.0, 0.0));\\
-        inst.get\_value(\&vals) // InfNum::from(2.0, -1.0)}}
+					\large{\textbf{let mut a = Function::new ();\\
+						a.add\_variable (String::from ("x"), InfNum::from (1.0, 0.0));\\
+						a.add\_variable (String::from ("y"), InfNum::from (-1.0, 0.0));\\
+						a.change\_coefficient (String::from ("y"), InfNum::from (-2.0, 0.0));\\
+						let c = a.get\_coefficient (String::from ("x")); // InfNum::from (1.0, 0.0)\\
+						let d = a.get\_coefficient (String::from ("y")); // InfNum::from (-2.0, 0.0)\\}}
+				\subsubsection{get\_value (values: \&$HashMap<String, InfNum>$)-$>$ InfNum}
+					Calculates and gives the result formed my replacing the variables as described in the HashHap.\\Example:\\
+					\large{\textbf{let mut inst = Function::new ();\\
+        inst.add\_variable (String::from ("y"), InfNum::from (2.0, -1.0));\\
+        let mut vals = HashMap::$<String, InfNum>$::new ();\\
+        vals.insert (String::from ("y"), InfNum::from (1.0, 0.0));\\
+        inst.get\_value (\&vals) // InfNum::from (2.0, -1.0)}}
 			\subsection{Constraint}
-				\Large{Constraint is the type that for modeling constraints.}
-				\subsubsection{new()-$>$ Constraint}
-					Returns a basic constraints(new function, equality, and free coefficient as new InfNum).
-				\subsubsection{from(left: Function, sign: Sign, right: InfNum)-$>$ Constraint}
+				\Large{Constraint is the type that is for modeling constraints.}
+				\subsubsection{new ()-$>$ Constraint}
+					Returns a basic constraint (new function, equality, and free coefficient as new InfNum).
+				\subsubsection{from (left: Function, sign: Sign, right: InfNum)-$>$ Constraint}
 					Returns a Constraint constructed with components as the given ones.
-				\subsubsection{check(variables: \&$HashMap<String, InfNum>)$ -$>$ bool}
-					Checks if the Constraint is met with the given values for the variables\\Example:\\
-					\large{\textbf{let mut inst = Consraint::new();\\
-        inst.left.add\_variable(\\
-            String::from("x"),\\
-            InfNum::from(1.0, 1.0),\\
+				\subsubsection{check (variables: \&$HashMap<String, InfNum>)$ -$>$ bool}
+					Checks if the Constraint is met with the given values for the variables.\\Example:\\
+					\large{\textbf{let mut inst = Consraint::new ();\\
+        inst.left.add\_variable (\\
+            String::from ("x"),\\
+            InfNum::from (1.0, 1.0),\\
         );\\
-        inst.left.add\_variable(\\
-            String::from("y"),\\
-            InfNum::from(1.0, 0.5),\\
+        inst.left.add\_variable (\\
+            String::from ("y"),\\
+            InfNum::from (1.0, 0.5),\\
         );\\
         inst.sign = Sign::GreaterOrEqual;\\
-        inst.right = InfNum::from(-1.0, 0.0);\\
-        let mut vals = HashMap::$<String, InfNum>$::new();\\
-        vals.insert(String::from("x"), InfNum::from(0.0, 0.0));\\
-        vals.insert(String::from("y"), InfNum::from(0.0, 1.0));\\
-        inst.check(\&vals) // true}}
+        inst.right = InfNum::from (-1.0, 0.0);\\
+        let mut vals = HashMap::$<String, InfNum>$::new ();\\
+        vals.insert (String::from ("x"), InfNum::from (0.0, 0.0));\\
+        vals.insert (String::from ("y"), InfNum::from (0.0, 1.0));\\
+        inst.check (\&vals) // true}}
 			\subsection{Solver}
-				\Large{Constraint is the type that for modeling constraints.}
-				\subsubsection{new()-$>$ Solver}
-					Returns a basic constraints(new function, equality, and free coefficient as new InfNum).
-				\subsubsection{from(function: Function, value: TargetValue, constraints: Vec$<Consraint>$)}
+				\Large{Constraint is the type that is for modeling the problems.}
+				\subsubsection{new ()-$>$ Solver}
+					Returns a basic constraints (new function, equality, and free coefficient as new InfNum).
+				\subsubsection{from (function: Function, value: TargetValue, constraints: Vec$<Consraint>$)}
 					Returns a Solver constructed with components as the given ones.
-				\subsubsection{canonical\_form()}
+				\subsubsection{canonical\_form ()}
 					Makes the problem in the canonical form.
-				\subsubsection{base\_form()-$>$ Vec$<InfNum>$}
+				\subsubsection{base\_form ()-$>$ Vec$<InfNum>$}
 					Makes the problem in the base form and returns a vector containing the base variables.
-				\subsubsection{get\_simplex\_table()-$>$ SimplexTable}
-					Makes the problem in canonical form, then in base form and constructs the simplex tabe.
-				\subsubsection{check\_optimality(table: \&SimplexTable)-$>$ bool}
-					Returns true if the data describing the problem is optimal(the problem is solved). Otherwise returns false.
-				\subsubsection{check\_limitlessness(table: \&SimplexTable)-$>$ bool}
-					Returns true if the problem is unlimited(no solution). Otherwise returns false.
-				\subsubsection{improve\_table(table: \&mut SimplexTable)}
+				\subsubsection{get\_simplex\_table ()-$>$ SimplexTable}
+					Makes the problem in canonical form, then in base form and constructs the simplex table.
+				\subsubsection{check\_optimality (table: \&SimplexTable)-$>$ bool}
+					Returns true if the data describing the problem is optimal (the problem is solved). Otherwise returns false.
+				\subsubsection{check\_limitlessness (table: \&SimplexTable)-$>$ bool}
+					Returns true if the problem is unlimited (no solution). Otherwise returns false.
+				\subsubsection{improve\_table (table: \&mut SimplexTable)}
 					Improves the table as described above.
 	\newpage
 	\section{Future}
-	First of all I have to make my code work. After that i will optimize the memory comspuption and the speed of the algorithm. When this is done I'm planning to implement integer solving(to return only itegers as values of the variables). While I am doing  all of this I will claryfy the conception of the infinite numbers.
+	First of all I have to make my code work. After that i will optimize the memory consumption and the speed of the algorithm. When this is done I'm planning to implement integer solving (to return only itegers as values of the variables). While I am doing  all of this I will clarify the conception of the infinity numbers.
+	\section{Code}
+	GitHub: \href{https://github.com/Ro6afF/linsol}{https://github.com/Ro6afF/linsol}\\
+	BitBucket: \href{https://bitbucket.org/Ro6afF/linsol}{https://bitbucket.org/Ro6afF/linsol}
 	\section{Acknowledgments}
  	 	 \Large{Special thanks to:
  	 	 \begin{itemize}
- 	 	 	\item Doychin Boyadjiev for giving the idea and explaining the algorithm.
+ 	 	 	\item Doychin Boyadjiev for improvement of the idea and explaining the algorithm.
  	 	 	\item Emil Kelevejiev for improvement of the idea and documentation
 			%\item Aleksander Targov for improvement of the documentation documentation
  	 	 \end{itemize}

@@ -985,20 +985,66 @@ mod tests {
         inst.constraints[len].sign = Sign::SmallerOrEqual;
         let mut table = inst.get_simplex_table();
         inst.improve_table(&mut table);
-        println!("{:?}", table);
-        /*for i in 0..table.len() {
-            for j in 0..table[0].len() {
-                match table[i][j] {
-                    TableCell::Value(_) => assert!(table[i][j] == expected[i][j]),
-                    _ => {}
-                }
-            }
-        }*/
-
     }
 
     #[test]
     fn solver_solve() {
+        let mut solver = Solver::new();
+        solver.target_function.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        solver.target_function.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.target_value = TargetValue::Min;
+        solver.constraints.push(Consraint::new());
+        solver.constraints[0].left.add_variable(
+            String::from("x1"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[0].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[0].sign = Sign::GreaterOrEqual;
+        solver.constraints[0].right = InfNum::from(1.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[1].left.add_variable(
+            String::from("x1"),
+            InfNum::from(3.0, 0.0),
+        );
+        solver.constraints[1].left.add_variable(
+            String::from("x2"),
+            InfNum::from(-2.0, 0.0),
+        );
+        solver.constraints[1].sign = Sign::SmallerOrEqual;
+        solver.constraints[1].right = InfNum::from(3.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[2].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[2].sign = Sign::SmallerOrEqual;
+        solver.constraints[2].right = InfNum::from(3.0, 0.0);
+        solver.constraints.push(Consraint::new());
+        solver.constraints[3].left.add_variable(
+            String::from("x1"),
+            InfNum::from(-2.0, 0.0),
+        );
+        solver.constraints[3].left.add_variable(
+            String::from("x2"),
+            InfNum::from(1.0, 0.0),
+        );
+        solver.constraints[3].sign = Sign::SmallerOrEqual;
+        solver.constraints[3].right = InfNum::from(1.0, 0.0);
+        println!("{:?}", solver.solve());
+        assert!(1 == 0);
+    }
+
+    #[test]
+    fn solver_solve1() {
         let mut solver = Solver::new();
         solver.target_function.add_variable(
             String::from("x1"),
@@ -1049,7 +1095,6 @@ mod tests {
         );
         solver.constraints[3].sign = Sign::SmallerOrEqual;
         solver.constraints[3].right = InfNum::from(1.0, 0.0);
-        println!("{:?}", solver.solve());
-        assert!(1 == 0);
+        assert_eq!(solver.solve(), Result::Err(String::from("Function is unlimited!")));
     }
 }

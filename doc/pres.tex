@@ -5,9 +5,6 @@
 \usepackage{amssymb,amsmath}
 \usepackage{hyperref}
 
-\def\fnmark#1{{\small}$^#1$}
-\def\fnote#1#2{$^#1\;$\texttt{#2}\\}
-
 \usetheme{Warsaw}
 
 \usetikzlibrary{positioning,shapes,shadows,arrows}
@@ -20,7 +17,8 @@
 		\begin{table}[]
 			\begin{tabular}{rl}
 				\normalsize{Author:    } & \normalsize{Dimo Chanev} \\
-				\scriptsize{Supervisior:     } & \scriptsize{Doychin Boyadzhiev}
+				\scriptsize{Supervisiors:     } & \scriptsize{Doychin Boyadzhiev} \\
+												& \scriptsize{Emil Kelevedjiev}
 			\end{tabular}
 		\end{table}
 	}
@@ -38,8 +36,8 @@
 		\begin{block}{}
 			The project is separated in two parts:
             \begin{itemize}
-            \item Infinite numbers
-            \item Linsol(linear solver $\to$ simplex)
+            \item Infinity numbers
+            \item Linsol (linear solver $\to$ simplex)
             \end{itemize}
 		\end{block}
 		\vspace{0.1cm}
@@ -50,15 +48,15 @@
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Infinite numbers}
+		\frametitle{Infinity numbers}
 		\begin{block}{Defifition}
 			Infinity number is a pair of real numbers. The one if for the real part and the other is for the infinity part.
-			$$(a; b) = a + b\infty, where\ a \in \mathbb{R}, b \in \{-1, 0, 1\}$$
+			$$ (a; b) = a + b\infty, where\ a \in \mathbb{R}, b \in \{-1, 0, 1\}$$
 		\end{block}
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Infinite numbers}
+		\frametitle{Infinity numbers}
 		\begin{block}{Comparison}
 			\begin{itemize}
 				\item If the infinity part of the number is $>1$ the number is $=\infty$
@@ -71,14 +69,14 @@
 	\end{frame}
 
 	\begin{frame}
-		\frametitle{Infinite numbers}
+		\frametitle{Infinity numbers}
 		\begin{block}{Math operations}
-			$$(a; b) \pm (c; d) = (a \pm b; c \pm d)$$
-			$$(a; b) \times (c; d) = (ab; ac + bc + bd)$$
-			\[ \frac{(a; b)}{(c; d)} = 
+			$$ (a; b) \pm (c; d) = (a \pm b; c \pm d)$$
+			$$ (a; b) \times (c; d) = (ab; ac + bc + bd)$$
+			\[ \frac{ (a; b)}{ (c; d)} = 
 				\begin{cases}
-					(\frac{b}{d}; 0)           & d \neq 0\\
-					(\frac{a}{c}; \frac{b}{c}) & d = 0
+					 (\frac{b}{d}; 0)           & d \neq 0\\
+					 (\frac{a}{c}; \frac{b}{c}) & d = 0
 				\end{cases} 
             \]   
 			\small{\textit{Note:} If the $infinity\ part\ of\ the\ number \notin \{-1, 0, 1\}$ we get it to one of these values}
@@ -106,22 +104,22 @@
 					\draw [color=cqcqcq,, xstep=1.2cm,ystep=1.2cm] (0.,-4.) grid (6.,6.);
 					\draw[->,color=black] (0.,0.) -- (6.,0.);
 					\foreach \x in {,2.,4.}
-					\draw[shift={(\x,0)},color=black] (0pt,2pt) -- (0pt,-2pt) node[below] {\footnotesize $\x$};
+					\draw[shift={ (\x,0)},color=black] (0pt,2pt) -- (0pt,-2pt) node[below] {\footnotesize $\x$};
 					\draw[->,color=black] (0.,-4.) -- (0.,6.);
 					\foreach \y in {-4.,-2.,2.,4.}
-					\draw[shift={(0,\y)},color=black] (2pt,0pt) -- (-2pt,0pt) node[left] {\footnotesize $\y$};
+					\draw[shift={ (0,\y)},color=black] (2pt,0pt) -- (-2pt,0pt) node[left] {\footnotesize $\y$};
 					\draw[color=black] (0pt,-10pt) node[right] {\footnotesize $0$};
-					\clip(0.,-4.) rectangle (6.,6.);
+					\clip (0.,-4.) rectangle (6.,6.);
 					\fill[line width=1.2pt,color=zzttqq,fill=zzttqq,fill opacity=0.10000000149011612] (0.5,-0.5) -- (3.,-3.) -- (5.,-1.) -- (2.5,1.5) -- cycle;
-					\draw [line width=1.2pt,domain=0.:6.] plot(\x,{(--4.-1.*\x)/1.});
-					\draw [line width=1.2pt,domain=0.:6.] plot(\x,{(--1.-1.*\x)/-1.});
-					\draw [line width=1.2pt,domain=0.:6.] plot(\x,{(--6.-1.*\x)/-1.});
-					\draw [line width=1.2pt,domain=0.:6.] plot(\x,{(-0.-1.*\x)/1.});
+					\draw [line width=1.2pt,domain=0.:6.] plot (\x,{ (--4.-1.*\x)/1.});
+					\draw [line width=1.2pt,domain=0.:6.] plot (\x,{ (--1.-1.*\x)/-1.});
+					\draw [line width=1.2pt,domain=0.:6.] plot (\x,{ (--6.-1.*\x)/-1.});
+					\draw [line width=1.2pt,domain=0.:6.] plot (\x,{ (-0.-1.*\x)/1.});
 					\draw [line width=1.2pt,color=zzttqq] (0.5,-0.5)-- (3.,-3.);
 					\draw [line width=1.2pt,color=zzttqq] (3.,-3.)-- (5.,-1.);
 					\draw [line width=1.2pt,color=zzttqq] (5.,-1.)-- (2.5,1.5);
 					\draw [line width=1.2pt,color=zzttqq] (2.5,1.5)-- (0.5,-0.5);
-					\draw [line width=1.2pt,domain=0.:6.] plot(\x,{(-14.003262108984158--10.726297038005976*\x)/9.713927429924514});
+					\draw [line width=1.2pt,domain=0.:6.] plot (\x,{ (-14.003262108984158--10.726297038005976*\x)/9.713927429924514});
 					\begin{scriptsize}
 					\draw[color=black] (-2.2446432797621805,6.516398410386435) node {$ $};
 					\draw[color=black] (-3.0159725049671047,-3.462673440702271) node {$ $};

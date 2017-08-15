@@ -4,7 +4,6 @@ use linsol::constraint::Sign;
 use linsol::constraint::Consraint;
 use linsol::utilities::get_random_name;
 use std::collections::HashMap;
-use std::f64;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -263,9 +262,19 @@ impl Solver {
         table[1][selectionv] = table[selectionb][1].clone();
         table[selectionb][1] = tmp;
 
+        for j in 0..table[0].len() - 2 {
+            match table[selectionb][j + 2].clone() {
+                TableCell::Value(x) => match table[selectionb][selectionv] {
+                    TableCell::Value(y) => table[selectionb][j + 2] = TableCell::Value(x / y),
+                    _ => {}
+                },
+                _ => {}
+            }
+        }
+
         for i in 0..table.len() - 2 {
             if i + 2 != selectionb {
-                let mut coefficient = InfNum::from(1.1, 1.0);
+                let mut coefficient = InfNum::from(1.0, 1.0);
                 match table[selectionb][selectionv] {
                     TableCell::Value(x) => {
                         match table[i + 2][selectionv] {
@@ -275,12 +284,12 @@ impl Solver {
                     }
                     _ => {}
                 }
-                for j in 0..table[i].len() - 3 {
-                    match table[i + 2][j + 3] {
+                for j in 0..table[i].len() - 2 {
+                    match table[i + 2][j + 2] {
                         TableCell::Value(x) => {
-                            match table[selectionb][j + 3] {
+                            match table[selectionb][j + 2] {
                                 TableCell::Value(y) => {
-                                    table[i + 2][j + 3] = TableCell::Value(x - coefficient * y)
+                                    table[i + 2][j + 2] = TableCell::Value(x - coefficient * y)
                                 }
                                 _ => {}
                             }
@@ -292,6 +301,7 @@ impl Solver {
         }
     }
 
+    #[allow(unused_variables)]
     pub fn solve(&mut self) -> Result<HashMap<String, InfNum>, String> {
         match self.target_value {
             TargetValue::Max => self.target_function *= InfNum::from(-1.0, 1.0),
@@ -301,20 +311,33 @@ impl Solver {
         let mut table = self.get_simplex_table();
         let mut plok = String::new();
         while !self.check_optimality(&table) {
-            plok.push_str(&format!("{:?}\n----------------------------\n", table));
+            for i in &table {
+                for j in i {
+                    plok.push_str(&format!("{: <60} | ", format!("{:?}", j)));
+                }
+                plok.push_str("\n")
+            }
+            plok.push_str(&format!("\n----------------------------\n"));
             if self.check_limitlessness(&table) {
-                println!("{}", plok);
                 return Result::Err(String::from("Function is unlimited!"));
             }
             self.improve_table(&mut table);
         }
+        for i in &table {
+                for j in i {
+                    plok.push_str(&format!("{: <60} | ", format!("{:?}", j)));
+                }
+                plok.push_str("\n")
+            }
+            plok.push_str(&format!("\n----------------------------\n"));
+        panic!("{}", plok);
         let mut res = HashMap::<String, InfNum>::new();
-        for i in 0..table.len() {
-            match table[i][1].clone() {
+        for i in 0..table.len() - 3 {
+            match table[i + 2][1].clone() {
                 TableCell::Name(x) => {
-                    let usless_shit = match table[i][2] {
+                    let usless_shit = match table[i + 2][2] {
                         TableCell::Value(y) => res.insert(x, y),
-                        _ => res.insert(String::from("OOPS"), InfNum::from(f64::NAN, f64::NAN)),
+                        _ => panic!("Got name in cell with value expected!"),
                     };
                 }
                 _ => {}

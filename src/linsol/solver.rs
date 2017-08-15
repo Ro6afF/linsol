@@ -4,6 +4,7 @@ use linsol::constraint::Sign;
 use linsol::constraint::Consraint;
 use linsol::utilities::get_random_name;
 use std::collections::HashMap;
+use std::f64;
 
 #[allow(dead_code)]
 #[derive(Clone, Debug)]
@@ -220,7 +221,7 @@ impl Solver {
         }
         false
     }
-
+/*
     pub fn improve_table(&self, table: &mut SimplexTable) {
         let mut selectionv: usize = 0;
         let mut maxdv = InfNum::from(0.0, -1.0);
@@ -264,10 +265,12 @@ impl Solver {
 
         for j in 0..table[0].len() - 2 {
             match table[selectionb][j + 2].clone() {
-                TableCell::Value(x) => match table[selectionb][selectionv] {
-                    TableCell::Value(y) => table[selectionb][j + 2] = TableCell::Value(x / y),
-                    _ => {}
-                },
+                TableCell::Value(x) => {
+                    match table[selectionb][selectionv] {
+                        TableCell::Value(y) => table[selectionb][j + 2] = TableCell::Value(x / y),
+                        _ => {}
+                    }
+                }
                 _ => {}
             }
         }
@@ -301,6 +304,82 @@ impl Solver {
         }
     }
 
+*/
+    pub fn improve_table(&self, table: &mut SimplexTable) {
+        let mut selectionv: usize = 0;
+        let mut maxv = InfNum::from(-1.0, -1.0);
+        let mut selectionb: usize = 0;
+        let mut minb = InfNum::from(1.0, 1.0);
+
+        for i in 0..table[0].len() - 3 {
+            match table[table.len() - 1][i + 3].clone() {
+                TableCell::Value(x) => {
+                    if x > maxv {
+                        maxv = x;
+                        selectionv = i + 3;
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        for i in 0..table.len() - 3 {
+            match table[i + 2][selectionv] {
+                TableCell::Value(x) => {
+                    match table[i + 2][2] {
+                        TableCell::Value(y) => {
+                            if x / y < minb {
+                                minb = x / y;
+                                selectionb = i + 2;
+                            }
+                        }
+                        _ => {}
+                    }
+                }
+                _ => {}
+            }
+        }
+        let tmp = table[selectionb][0].clone();
+        table[selectionb][0] = table[0][selectionv].clone();
+        table[0][selectionv] = tmp;
+        let tmp = table[selectionb][1].clone();
+        table[selectionb][1] = table[1][selectionv].clone();
+        table[1][selectionv] = tmp;
+        let curr = match table[selectionb][selectionv] {
+            TableCell::Value(x) => x,
+            _ => InfNum::from(f64::NAN, f64::NAN),
+        };
+
+        for i in 0..table[0].len() - 2 {
+            match table[selectionb][i + 2] {
+                TableCell::Value(x) => table[selectionb][i + 2] = TableCell::Value(x / curr),
+                _ => {}
+            }
+        }
+
+        for i in 0..table.len() - 2 {
+            if i + 2 != selectionb {
+                let coef = match table[i + 2][selectionv] {
+                    TableCell::Value(x) => x / curr,
+                    _ => InfNum::from(f64::NAN, f64::NAN),
+                };
+                for j in 0..table[i].len() - 2 {
+                    table[i + 2][j + 2] = TableCell::Value(match table[i + 2][j + 2] {
+                        TableCell::Value(x) => {
+                            x -
+                                coef *
+                                    match table[selectionb][j + 2] {
+                                        TableCell::Value(y) => y,
+                                        _ => InfNum::from(f64::NAN, f64::NAN),
+                                    }
+                        }
+                        _ => InfNum::from(f64::NAN, f64::NAN),
+                    })
+                }
+            }
+        }
+    }
+
     #[allow(unused_variables)]
     pub fn solve(&mut self) -> Result<HashMap<String, InfNum>, String> {
         match self.target_value {
@@ -324,18 +403,18 @@ impl Solver {
             self.improve_table(&mut table);
         }
         for i in &table {
-                for j in i {
-                    plok.push_str(&format!("{: <60} | ", format!("{:?}", j)));
-                }
-                plok.push_str("\n")
+            for j in i {
+                plok.push_str(&format!("{: <60} | ", format!("{:?}", j)));
             }
-            plok.push_str(&format!("\n----------------------------\n"));
+            plok.push_str("\n")
+        }
+        plok.push_str(&format!("\n----------------------------\n"));
         panic!("{}", plok);
         let mut res = HashMap::<String, InfNum>::new();
         for i in 0..table.len() - 3 {
             match table[i + 2][1].clone() {
                 TableCell::Name(x) => {
-                    let usless_shit = match table[i + 2][2] {
+                    let _ = match table[i + 2][2] {
                         TableCell::Value(y) => res.insert(x, y),
                         _ => panic!("Got name in cell with value expected!"),
                     };

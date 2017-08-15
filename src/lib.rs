@@ -1095,6 +1095,9 @@ mod tests {
         );
         solver.constraints[3].sign = Sign::SmallerOrEqual;
         solver.constraints[3].right = InfNum::from(1.0, 0.0);
-        assert_eq!(solver.solve(), Result::Err(String::from("Function is unlimited!")));
+        assert_eq!(
+            solver.solve(),
+            Result::Err(String::from("Function is unlimited!"))
+        );
     }
 }

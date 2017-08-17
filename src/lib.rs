@@ -990,55 +990,27 @@ mod tests {
     #[test]
     fn solver_solve() {
         let mut solver = Solver::new();
-        solver.target_function.add_variable(
-            String::from("x1"),
-            InfNum::from(-2.0, 0.0),
-        );
-        solver.target_function.add_variable(
-            String::from("x2"),
-            InfNum::from(1.0, 0.0),
-        );
+        solver.target_function.add_variable(String::from("x"), InfNum::from(0.2, 0.0));
+        solver.target_function.add_variable(String::from("y"), InfNum::from(0.08, 0.0));
         solver.target_value = TargetValue::Min;
         solver.constraints.push(Consraint::new());
-        solver.constraints[0].left.add_variable(
-            String::from("x1"),
-            InfNum::from(1.0, 0.0),
-        );
-        solver.constraints[0].left.add_variable(
-            String::from("x2"),
-            InfNum::from(1.0, 0.0),
-        );
+        solver.constraints[0].left.add_variable(String::from("x"), InfNum::from(0.1, 0.0));
         solver.constraints[0].sign = Sign::GreaterOrEqual;
-        solver.constraints[0].right = InfNum::from(1.0, 0.0);
+        solver.constraints[0].right = InfNum::from(0.4, 0.0);
         solver.constraints.push(Consraint::new());
-        solver.constraints[1].left.add_variable(
-            String::from("x1"),
-            InfNum::from(3.0, 0.0),
-        );
-        solver.constraints[1].left.add_variable(
-            String::from("x2"),
-            InfNum::from(-2.0, 0.0),
-        );
-        solver.constraints[1].sign = Sign::SmallerOrEqual;
-        solver.constraints[1].right = InfNum::from(3.0, 0.0);
+        solver.constraints[1].left.add_variable(String::from("y"), InfNum::from(0.1, 0.0));
+        solver.constraints[1].sign = Sign::GreaterOrEqual;
+        solver.constraints[1].right = InfNum::from(0.6, 0.0);
         solver.constraints.push(Consraint::new());
-        solver.constraints[2].left.add_variable(
-            String::from("x2"),
-            InfNum::from(1.0, 0.0),
-        );
-        solver.constraints[2].sign = Sign::SmallerOrEqual;
-        solver.constraints[2].right = InfNum::from(3.0, 0.0);
+        solver.constraints[2].left.add_variable(String::from("x"), InfNum::from(0.1, 0.0));
+        solver.constraints[2].left.add_variable(String::from("y"), InfNum::from(0.2, 0.0));
+        solver.constraints[2].sign = Sign::GreaterOrEqual;
+        solver.constraints[2].right = InfNum::from(2.0, 0.0);
         solver.constraints.push(Consraint::new());
-        solver.constraints[3].left.add_variable(
-            String::from("x1"),
-            InfNum::from(-2.0, 0.0),
-        );
-        solver.constraints[3].left.add_variable(
-            String::from("x2"),
-            InfNum::from(1.0, 0.0),
-        );
-        solver.constraints[3].sign = Sign::SmallerOrEqual;
-        solver.constraints[3].right = InfNum::from(1.0, 0.0);
+        solver.constraints[3].left.add_variable(String::from("x"), InfNum::from(0.2, 0.0));
+        solver.constraints[3].left.add_variable(String::from("y"), InfNum::from(0.1, 0.0));
+        solver.constraints[3].sign = Sign::GreaterOrEqual;
+        solver.constraints[3].right = InfNum::from(1.7, 0.0);
         println!("{:?}", solver.solve());
         assert!(1 == 0);
     }

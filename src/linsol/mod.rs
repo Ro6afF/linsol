@@ -3,3 +3,4 @@ pub mod function;
 pub mod constraint;
 pub mod solver;
 pub mod utilities;
+pub mod target_function;
